@@ -1,54 +1,44 @@
-# Tabris Threads
+## Blocking Issue 1:
 
-## Run
+Android only
 
-If you haven't done so already, install the [Tabris CLI](https://www.npmjs.com/package/tabris-cli) on your machine:
+global constructor "Window" makes threads.js not detect a worker correctly. However, there is no such constructor put in to global scope in the tabris bootstrap. Created by native?
 
-```
-npm i tabris-cli -g
-```
+Workaround:
 
-Then in the project directory, type:
-
-```
-npm start
-```
-Or choose "npm: start" from the Visual Studio Code task runner to make compile errors appear in the "Problems" view.
-
-This will start a Tabris.js code server at a free port and print its URL to the console. The app code can then be [side-loaded](https://docs.tabris.com/3.7/developer-app.html#run-your-app) in the [developer app](https://docs.tabris.com/3.7/developer-app.html) by entering that URL.
-
-Alternatively you can also call the Tabris CLI directly:
-
-```
-tabris serve -a -w
+```ts
+delete global.Window;
 ```
 
-This the same as running `npm start`. The `-w` switch starts the compiler in watch mode, meaning you do not have to re-start the server after each code change, and `-a` causes the app to reload automatically as well.
+## Blocking Issue 2:
 
-## Test
+Android only
 
-This project includes a ESLint configuration that helps preventing common mistakes in your code. Most IDEs can display ESLint-based hints directly in the editor, but you can also run the tool explicitly via:
+sometimes worker says:
+Could not start tabris: Only the original thread that created a view hierarchy can touch its views.
 
-```
-npm test
-```
+but only sometimes
 
-This will also check for compile errors.
+followed by blank screen on reload (status/nav bar only)
 
-The initial rules defined in `.eslintrc` are supposed to warn against problematic patterns, but not enforce a strict code style. You may want to [adjust them](https://eslint.org/docs/rules/) according to your taste. TypeScript specific rules are documented [here](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin) and JSX-Syntax specific rules [here](https://github.com/yannickcr/eslint-plugin-react). These can only be used in the dedicated `override` section of `.eslintrc`.
+## Blocking Issue 4:
 
-## Debugging
+"TypeError: undefined is not a function" (Android)
+
+https://github.com/eclipsesource/tabris-android/blob/4c0e6312779c37d3a9c7a9a9a2137b1517ad0e71/tabris/src/main/java/com/eclipsesource/tabris/android/internal/nativeobject/worker/Worker.kt#L140
+
+"Function 'onmessage' not found" (iOS)
+
+https://github.com/eclipsesource/tabris-ios/blob/d4a500fdbe8e191983cb3b9e6e7221ac98eefe1c/Tabris/Tabris/Classes/BindingPostWorkerMessageOperation.swift#L23
+
+## General Issues in worker:
+
+### console output not on CLI
+
+because no websocket is started?
+fix: pipe errors through to main thread?
 
 
-### Android
+### No stack traces on error
 
-To debug your application running on an Android device, first click the debug icon on the Visual Studio Code activity bar. This opens the debug side bar where you can launch the configuration "Debug Tabris on Android" and enter the device's IP address. More information can be found [here](https://docs.tabris.com/3.7/debug.html#android).
-
-### iOS
-
-On iOS, the Safari developer tools [can be used for debugging](https://docs.tabris.com/3.7/debug.html#ios).
-## Build
-
-The app can be built using the online build service at [tabrisjs.com](https://tabrisjs.com) or locally using [Tabris.js CLI](https://www.npmjs.com/package/tabris-cli).
-
-See [Building a Tabris.js App](https://docs.tabris.com/3.7/build.html) for more information.
+because "onmessage" it's not wrapped

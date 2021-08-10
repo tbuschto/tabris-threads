@@ -1,4 +1,4 @@
-import {Composite, TextView, Button, Constraint, Properties} from 'tabris';
+import {Composite, TextView, Button, Properties, Stack} from 'tabris';
 import {component, bindAll} from 'tabris-decorators';
 import {MainViewModel} from './MainViewModel';
 
@@ -13,10 +13,13 @@ export class MainView extends Composite {
   constructor(properties: Properties<MainView>) {
     super();
     this.set(properties).append(
-      <$>
-        <TextView id='label' centerX padding={16} bottom={Constraint.next} font={{size: 24}}/>
-        <Button center onSelect={() => void this.model.continue()}>Tap here</Button>
-      </$>
+      <Stack stretch padding={24} spacing={12} alignment='stretchX'>
+        <Button onSelect={() => void this.model.createCounter()}>create counter</Button>
+        <Button onSelect={() => void this.model.increment()}>increment</Button>
+        <Button onSelect={() => void this.model.print()}>print</Button>
+        <Button onSelect={() => void this.model.terminate()}>terminate</Button>
+        <TextView id='label' padding={16} font={{size: 24}}/>
+      </Stack>
     );
   }
 

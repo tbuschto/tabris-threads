@@ -6,7 +6,7 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "build": "webpack",
     "watch": "webpack -w",
-    "start": "tabris serve -a -w"
+    "start": "tabris serve -a -w -i"
   },
   "dependencies": {
     "tabris": "~3.7.2",
